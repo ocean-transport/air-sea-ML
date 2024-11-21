@@ -94,7 +94,7 @@ def load_and_combine_cm26(
         periodic=True,
     )
     ds_atmos_regridded = regridder(
-        ds_atmos[["slp", "v_ref", "u_ref", "t_ref", "q_ref", "wind"]]
+        ds_atmos[["slp", "v_ref", "u_ref", "t_ref", "q_ref", "wind", "rh_ref"]]
     )  # We are only doing noskin for now , 'swdn_sfc', 'lwdn_sfc'
 
     ## combine into merged dataset
@@ -116,7 +116,7 @@ def load_and_combine_cm26(
     # atmos missing values are filled with 0s, which causes issues with the filtering
     # Ideally this should be masked before the regridding, but xesmf fills with 0 again...
     mask = ~np.isnan(ds_merged['surface_temp'].isel(time=0).reset_coords(drop=True))
-    for mask_var in ['slp', 't_ref', 'q_ref', 'v_ref', 'u_ref', 'wind']:
+    for mask_var in ['slp', 't_ref', 'q_ref', 'v_ref', 'u_ref', 'wind', 'rh_ref']:
         ds_merged[mask_var] = ds_merged[mask_var].where(mask)
     
     
