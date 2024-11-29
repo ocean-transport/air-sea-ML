@@ -63,7 +63,7 @@ class SimpleCNN(nn.Module):
         return x
 
 class TensorDataset(Dataset):
-    def __init__(self, tensor_data, input_channels=2):
+    def __init__(self, tensor_data, input_channels):
         """
         Initialize the dataset with tensor data and the number of input channels.
 
