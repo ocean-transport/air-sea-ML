@@ -72,6 +72,15 @@ def evaluate_model(model, test_loader, criterion, batch_size=1):
 
 
 def plot_predictions_vs_targets(predictions, targets, num_samples=9):
+    """
+    Plot predictions and targets side-by-side with individual colorbars for each pair.
+    The prediction plot uses the target plot's vmin and vmax for consistency.
+
+    Args:
+        predictions (Tensor): Model predictions, shape (N, C, H, W) or (N, H, W).
+        targets (Tensor): Ground truth targets, shape (N, C, H, W) or (N, H, W).
+        num_samples (int): Number of samples to display. Default is 9.
+    """
     # Ensure we're only plotting a limited number of samples
     num_samples = min(num_samples, predictions.shape[0])
 
@@ -79,15 +88,19 @@ def plot_predictions_vs_targets(predictions, targets, num_samples=9):
     fig, axes = plt.subplots(num_samples, 2, figsize=(10, 2 * num_samples))
 
     for i in range(num_samples):
+        # Determine vmin and vmax for the target plot
+        target_image = targets[i]
+        target_vmin = target_image.min().item()
+        target_vmax = target_image.max().item()
+
         # Plot the target image
         ax = axes[i, 0]
-        target_image = targets[i]
-        
+
         # Check the number of dimensions and reshape if necessary
         if target_image.dim() == 3:
-            img = ax.imshow(target_image.permute(1, 2, 0).cpu().numpy(), vmin=-10, vmax=5)  # (C, H, W) to (H, W, C)
+            img = ax.imshow(target_image.permute(1, 2, 0).cpu().numpy(), vmin=target_vmin, vmax=target_vmax)
         elif target_image.dim() == 2:
-            img = ax.imshow(target_image.cpu().numpy(), vmin=-10, vmax=5)  # Single channel image
+            img = ax.imshow(target_image.cpu().numpy(), vmin=target_vmin, vmax=target_vmax)
         ax.set_title(f'Target {i + 1}')
         ax.axis('off')
 
@@ -97,12 +110,12 @@ def plot_predictions_vs_targets(predictions, targets, num_samples=9):
         # Plot the predicted image
         ax = axes[i, 1]
         prediction_image = predictions[i]
-        
+
         # Check the number of dimensions and reshape if necessary
         if prediction_image.dim() == 3:
-            img = ax.imshow(prediction_image.permute(1, 2, 0).cpu().numpy(), vmin=-10, vmax=5)  # (C, H, W) to (H, W, C)
+            img = ax.imshow(prediction_image.permute(1, 2, 0).cpu().numpy(), vmin=target_vmin, vmax=target_vmax)
         elif prediction_image.dim() == 2:
-            img = ax.imshow(prediction_image.cpu().numpy(), vmin=-10, vmax=5)  # Single channel image
+            img = ax.imshow(prediction_image.cpu().numpy(), vmin=target_vmin, vmax=target_vmax)
         ax.set_title(f'Prediction {i + 1}')
         ax.axis('off')
 
@@ -111,4 +124,5 @@ def plot_predictions_vs_targets(predictions, targets, num_samples=9):
 
     plt.tight_layout()
     plt.show()
+
 
